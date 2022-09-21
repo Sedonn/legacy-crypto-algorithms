@@ -52,8 +52,8 @@ class Caesar:
 caesar_en = Caesar('en', 5)
 caesar_ru = Caesar('ru', 5)
 
-print('Encoded:', caesar_en.encode('HELLO WORLD'))
-print('Decoded:', caesar_en.decode('MJQQT BTWQI'))
+print('Encoded en:', caesar_en.encode('HELLO WORLD'))
+print('Decoded en:', caesar_en.decode('MJQQT BTWQI'))
 
-print('Encoded:', caesar_ru.encode('ПРИВЕТ МИР'))
-print('Decoded:', caesar_ru.decode('ФХНЗКЧ СНХ'))
+print('Encoded ru:', caesar_ru.encode('ПРИВЕТ МИР'))
+print('Decoded ru:', caesar_ru.decode('ФХНЗКЧ СНХ'))

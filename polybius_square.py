@@ -92,22 +92,22 @@ polybius_en_horizontal = PolybiusSquare('en', horizontal=True)
 polybius_ru_vertical = PolybiusSquare('ru')
 polybius_ru_horizontal = PolybiusSquare('ru', horizontal=True)
 
-print('Encoded with vertical and en:',
+print('Encoded vertically en:',
       polybius_en_vertical.encode('HELLO WORLD'))
-print('Decoded with vertical and en:',
+print('Decoded vertically en:',
       polybius_en_vertical.decode('NKQQT BTWQI'))
 
-print('Encoded with horizontal and en:',
+print('Encoded horizontally en:',
       polybius_en_horizontal.encode('HELLO WORLD'))
-print('Decoded with horizontal and en:',
+print('Decoded horizontally en:',
       polybius_en_horizontal.decode('IAMMP XPSME'))
 
-print('Encoded with vertical and ru:',
+print('Encoded vertically ru:',
       polybius_ru_vertical.encode('ПРИВЕТ МИР'))
-print('Decoded with vertical and ru:',
+print('Decoded vertically ru:',
       polybius_ru_vertical.decode('ХЦПИМШ ТПЦ'))
 
-print('Encoded with horizontal and ru:',
+print('Encoded horizontally ru:',
       polybius_ru_horizontal.encode('ПРИВЕТ МИР'))
-print('Decoded with horizontal and ru:',
+print('Decoded horizontally ru:',
       polybius_ru_horizontal.decode('РСКГАН ЖКС'))

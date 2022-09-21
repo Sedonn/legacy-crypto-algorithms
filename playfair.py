@@ -175,10 +175,10 @@ class Playfair:
 playfair_en = Playfair('en')
 playfair_ru = Playfair('ru')
 
-print('Encoded:', playfair_en.encode(
+print('Encoded en:', playfair_en.encode(
     'IDIOCYOFTENLOOKSLIKEINTELLIGENCE', 'WHEATSON'))
-print('Decoded:', playfair_en.decode(
+print('Decoded en:', playfair_en.decode(
     'KFFBBZFMWASPNVCFDUKDAGCEWPQDPNBSNE', 'WHEATSON'))
 
-print('Encoded:', playfair_ru.encode('ПРИВЕТМИР', 'КЛАД'))
-print('Decoded:', playfair_ru.decode('РСМБМОГМПЦ', 'КЛАД'))
+print('Encoded ru:', playfair_ru.encode('ПРИВЕТМИР', 'КЛАД'))
+print('Decoded ru:', playfair_ru.decode('РСМБМОГМПЦ', 'КЛАД'))

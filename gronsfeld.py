@@ -59,8 +59,8 @@ class Gronsfeld:
 gronsfeld_en = Gronsfeld('en')
 gronsfeld_ru = Gronsfeld('ru')
 
-print('Encoded:', gronsfeld_en.encode('HELLO WORLD', 1234))
-print('Decoded:', gronsfeld_en.decode('IGOPP ZSSNG', 1234))
+print('Encoded en:', gronsfeld_en.encode('HELLO WORLD', 1234))
+print('Decoded en:', gronsfeld_en.decode('IGOPP ZSSNG', 1234))
 
-print('Encoded:', gronsfeld_ru.encode('ПРИВЕТ МИР', 1234))
-print('Decoded:', gronsfeld_ru.decode('РТЛЖЖФ РЙТ', 1234))
+print('Encoded ru:', gronsfeld_ru.encode('ПРИВЕТ МИР', 1234))
+print('Decoded ru:', gronsfeld_ru.decode('РТЛЖЖФ РЙТ', 1234))

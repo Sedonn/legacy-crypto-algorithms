@@ -2,9 +2,9 @@ from math import ceil
 import numpy as np
 
 
-class PermutationCipher:
+class TranspositionCipher:
     '''
-    Class for encoding and decoding strings with the Permutation cipher
+    Class for encoding and decoding strings with the Transposition cipher
     The cipher has two modes - horizontal and vertical
     Horizontal mode - chars of the message are record to matrix vertically and after encryption are reading horizontly
     Vertical mode - chars of the message are record to matrix horizontly and after encryption are reading vertically
@@ -46,7 +46,7 @@ class PermutationCipher:
             # Creating a matrix with length of rows equal to length of key and transpose it to vertical view of chars
             char_matrix = self.__create_char_matrix(message, key).T
 
-        # Permutation cols
+        # Transposition cols
         char_matrix_encoded = char_matrix[:, np.argsort([*key])]
 
         if self._is_vertical:
@@ -58,7 +58,7 @@ class PermutationCipher:
 
     def decode(self, message: str, key: str) -> str:
         '''
-        Decode the message by back permutations
+        Decode the message by back transpositions
         To decode a matrix, it is necessary to find a sequence of indices, 
         which are such a sequence that bring back the sorted sequence of key chars
         to the original form of the key char sequence
@@ -83,14 +83,14 @@ class PermutationCipher:
             return self.__to_string(char_matrix_decoded.T).replace('_', '')
 
 
-permutation_horizontal = PermutationCipher()
+transposition_horizontal = TranspositionCipher()
 print('Encoded horizontally:', end=' ')
-print(repr(permutation_horizontal.encode('WHAT THE BUATIFUL WORLD AROUND US', 'SUN')))
+print(repr(transposition_horizontal.encode('WHAT THE BUATIFUL WORLD AROUND US', 'SUN')))
 print('Decoded horizontally:', end=' ')
-print(repr(permutation_horizontal.decode('DWA HTAAIRTFO UUTLNH DEW  OUBRSUL', 'SUN')))
+print(repr(transposition_horizontal.decode('DWA HTAAIRTFO UUTLNH DEW  OUBRSUL', 'SUN')))
 
-permutation_vertical = PermutationCipher(vertical=True)
+transposition_vertical = TranspositionCipher(vertical=True)
 print('Encoded vertically:', end=' ')
-print(repr(permutation_vertical.encode('ЧТО ЗА ЗАМЕЧАТЕЛЬНЫЙ МИР ВОКРУГ НАС', 'СОЛНЦЕ')))
+print(repr(transposition_vertical.encode('WHAT THE BUATIFUL WORLD AROUND US', 'SUN')))
 print('Decoded vertically:', end=' ')
-print(repr(permutation_vertical.decode('АЧНРУ_ОАЕ ОН МЛМКАТЗТЙВ Ч АЫ ГЗЕЬИРС', 'СОЛНЦЕ')))
+print(repr(transposition_vertical.decode('AT AF R ODSWTHBTUWLAU H EUILODRNU', 'SUN')))
