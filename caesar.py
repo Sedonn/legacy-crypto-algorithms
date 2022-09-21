@@ -18,22 +18,22 @@ class Caesar:
         except KeyError:
             raise KeyError('Invalid language key!')
         else:
-            self._aplhabet = alphabet
+            self._alphabet = alphabet
             self._alph_len = len(alphabet)
         self.step = step
         pass
 
     def __encode_char(self, index: int) -> str:
         '''Get encoded char by index by formula: Ei = (Ci + S) mod N, where N - alphabet length, S - step'''
-        return self._aplhabet[(index + self.step) % self._alph_len]
+        return self._alphabet[(index + self.step) % self._alph_len]
 
     def __decode_char(self, index: int) -> str:
         '''Get decoded char by index by formula: Di = Ci - S, S - step'''
-        return self._aplhabet[index - self.step]
+        return self._alphabet[index - self.step]
 
     def __caesar(self, char: str, char_transform: Callable[[int], str]) -> str:
         '''Transform char with Caesar cipher by callable method'''
-        index = self._aplhabet.find(char)
+        index = self._alphabet.find(char)
         # Ignoring non-alphabet chars and symbols
         if index == -1:
             return char

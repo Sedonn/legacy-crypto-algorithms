@@ -18,21 +18,21 @@ class Gronsfeld:
         except KeyError:
             raise KeyError('Invalid language key!')
         else:
-            self._aplhabet = alphabet
+            self._alphabet = alphabet
             self._alph_len = len(alphabet)
         pass
 
     def __encode_char(self, index: int, step: int) -> str:
         '''Get encoded char by index by formula: Ei = (Ci + S) mod N, where N - alphabet length, S - step'''
-        return self._aplhabet[(index + step) % self._alph_len]
+        return self._alphabet[(index + step) % self._alph_len]
 
     def __decode_char(self, index: int, step: int) -> str:
         '''Get decoded char by index by formula: Di = Ci - S, S - step'''
-        return self._aplhabet[index - step]
+        return self._alphabet[index - step]
 
     def __gronsfeld(self, char: str, step: int, char_transform: Callable[[int, int], str]) -> str:
         '''Transform char with Gronsfeld cipher by callable method'''
-        index = self._aplhabet.find(char)
+        index = self._alphabet.find(char)
         # Ignoring non-alphabet chars and symbols
         if index == -1:
             return char

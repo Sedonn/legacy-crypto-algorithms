@@ -60,7 +60,7 @@ class PolybiusSquare:
         else:
             char_indices = np.where(self._alphabet_matrix_T == char)
 
-        # Return not changed char if it specical char
+        # Return not changed char if it is specical char
         if not char_indices[0].size:
             return char
 
