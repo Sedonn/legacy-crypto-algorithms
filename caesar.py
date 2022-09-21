@@ -1,34 +1,59 @@
+from enum import Enum
+from typing import Callable
+
+
+class Lang(Enum):
+    '''Class for language settings'''
+
+    ru = 'АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'
+    en = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
+
 class Caesar:
-    APLHABET = 'АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'
-    MODE_ENCODE = 'encode'
-    MODE_DECODE = 'decode'
+    '''Class for encoding and decoding strings with the Caesar cipher'''
 
-    @staticmethod
-    def __get_char(index) -> str:
-        if index >= len(Caesar.APLHABET):
-            return Caesar.APLHABET[abs(len(Caesar.APLHABET) - index)]
+    def __init__(self, lang_key: str, step: int) -> None:
+        try:
+            alphabet = Lang[lang_key].value
+        except KeyError:
+            raise KeyError('Invalid language key!')
         else:
-            return Caesar.APLHABET[index]
+            self._aplhabet = alphabet
+            self._alph_len = len(alphabet)
+        self.step = step
+        pass
 
-    @staticmethod
-    def __tranform_char(char: str, step: int, mode: str) -> str:
-        index = Caesar.APLHABET.find(char)
-        if index != -1:
-            if mode == Caesar.MODE_DECODE:
-                return Caesar.__get_char(index - step)
-            elif mode == Caesar.MODE_ENCODE:
-                return Caesar.__get_char(index + step)
-        else:
+    def __encode_char(self, index: int) -> str:
+        '''Get encoded char by index by formula: Ei = (Ci + S) mod N, where N - alphabet length, S - step'''
+        return self._aplhabet[(index + self.step) % self._alph_len]
+
+    def __decode_char(self, index: int) -> str:
+        '''Get decoded char by index by formula: Di = Ci - S, S - step'''
+        return self._aplhabet[index - self.step]
+
+    def __caesar(self, char: str, char_transform: Callable[[int], str]) -> str:
+        '''Transform char with Caesar cipher by callable method'''
+        index = self._aplhabet.find(char)
+        # Ignoring non-alphabet chars and symbols
+        if index == -1:
             return char
 
-    @staticmethod
-    def encode(message: str, step: int) -> str:
-        return ''.join(map(lambda x: Caesar.__tranform_char(x, step, Caesar.MODE_ENCODE), message))
+        return char_transform(index)
 
-    @staticmethod
-    def decode(message: str, step: int) -> str:
-        return ''.join(map(lambda x: Caesar.__tranform_char(x, step, Caesar.MODE_DECODE), message))
+    def encode(self, message: str) -> str:
+        '''Encode message with Caesar cipher'''
+        return ''.join(map(lambda x: self.__caesar(x, self.__encode_char), message))
+
+    def decode(self, message: str) -> str:
+        '''Decode message with Caesar cipher'''
+        return ''.join(map(lambda x: self.__caesar(x, self.__decode_char), message))
 
 
-# CAESAR_MESSAGE = 'ЧКОВЙЦЦЧМЧ ЫЩС МЧНЙ ПНЬЫ'
-# print('Decoded:', Caesar.decode(CAESAR_MESSAGE, 9))
+caesar_en = Caesar('en', 5)
+caesar_ru = Caesar('ru', 5)
+
+print('Encoded:', caesar_en.encode('HELLO WORLD'))
+print('Decoded:', caesar_en.decode('MJQQT BTWQI'))
+
+print('Encoded:', caesar_ru.encode('ПРИВЕТ МИР'))
+print('Decoded:', caesar_ru.decode('ФХНЗКЧ СНХ'))

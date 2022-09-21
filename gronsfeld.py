@@ -1,43 +1,66 @@
+from enum import Enum
 from itertools import cycle
+from typing import Callable
+
+
+class Lang(Enum):
+    '''Class for language settings'''
+    ru = 'АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'
+    en = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 
 class Gronsfeld:
-    APLHABET = 'АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'
-    MODE_ENCODE = 'encode'
-    MODE_DECODE = 'decode'
+    '''Class for encoding and decoding strings with the Gronsfeld cipher'''
 
-    @staticmethod
-    def __get_char(index) -> str:
-        if index >= len(Gronsfeld.APLHABET):
-            return Gronsfeld.APLHABET[abs(len(Gronsfeld.APLHABET) - index)]
+    def __init__(self, lang_key: str) -> None:
+        try:
+            alphabet = Lang[lang_key].value
+        except KeyError:
+            raise KeyError('Invalid language key!')
         else:
-            return Gronsfeld.APLHABET[index]
+            self._aplhabet = alphabet
+            self._alph_len = len(alphabet)
+        pass
 
-    @staticmethod
-    def __tranform_char(char: str, step: int, mode: str) -> str:
-        index = Gronsfeld.APLHABET.find(char)
-        if index != -1:
-            if mode == Gronsfeld.MODE_DECODE:
-                return Gronsfeld.__get_char(index - step)
-            elif mode == Gronsfeld.MODE_ENCODE:
-                return Gronsfeld.__get_char(index + step)
-        else:
+    def __encode_char(self, index: int, step: int) -> str:
+        '''Get encoded char by index by formula: Ei = (Ci + S) mod N, where N - alphabet length, S - step'''
+        return self._aplhabet[(index + step) % self._alph_len]
+
+    def __decode_char(self, index: int, step: int) -> str:
+        '''Get decoded char by index by formula: Di = Ci - S, S - step'''
+        return self._aplhabet[index - step]
+
+    def __gronsfeld(self, char: str, step: int, char_transform: Callable[[int, int], str]) -> str:
+        '''Transform char with Gronsfeld cipher by callable method'''
+        index = self._aplhabet.find(char)
+        # Ignoring non-alphabet chars and symbols
+        if index == -1:
             return char
 
-    @staticmethod
-    def __prepare_message(message: str, key: str) -> list:
-        return [(char, int(step)) for char, step in zip(message, cycle(key))]
+        return char_transform(index, step)
 
-    @staticmethod
-    def encode_zip(message: str, key: str) -> str:
-        return ''.join(map(lambda x: Gronsfeld.__tranform_char(x[0], x[1], Gronsfeld.MODE_ENCODE), Gronsfeld.__prepare_message(message, key)))
+    def __prepare_message(self, message: str, key: str) -> list:
+        '''Create list of tuples which contain chars and its own indices'''
+        return [(char, int(step)) for char, step in zip(message, cycle(str(key)))]
 
-    @staticmethod
-    def decode_zip(message: str, key: str) -> str:
-        return ''.join(map(lambda x: Gronsfeld.__tranform_char(x[0], x[1], Gronsfeld.MODE_DECODE), Gronsfeld.__prepare_message(message, key)))
+    def encode(self, message: str, key: str) -> str:
+        '''Encode message with Gronsfeld cipher'''
+        prepared_message = self.__prepare_message(message, key)
+
+        return ''.join(map(lambda x: self.__gronsfeld(x[0], x[1], self.__encode_char), prepared_message))
+
+    def decode(self, message: str, key: str) -> str:
+        '''Decode message with Gronsfeld cipher'''
+        prepared_message = self.__prepare_message(message, key)
+
+        return ''.join(map(lambda x: self.__gronsfeld(x[0], x[1], self.__decode_char), prepared_message))
 
 
-# GRONSFELD_MESSAGE = 'МАЛ КЛОП, ДА ВОНЮЧ'
-# GRONSFELD_KEY = '5345621'
+gronsfeld_en = Gronsfeld('en')
+gronsfeld_ru = Gronsfeld('ru')
 
-# print('Encoded:', Gronsfeld.encode_zip(GRONSFELD_MESSAGE, GRONSFELD_KEY))
+print('Encoded:', gronsfeld_en.encode('HELLO WORLD', 1234))
+print('Decoded:', gronsfeld_en.decode('IGOPP ZSSNG', 1234))
+
+print('Encoded:', gronsfeld_ru.encode('ПРИВЕТ МИР', 1234))
+print('Decoded:', gronsfeld_ru.decode('РТЛЖЖФ РЙТ', 1234))

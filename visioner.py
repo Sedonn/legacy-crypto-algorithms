@@ -1,33 +1,71 @@
+from enum import Enum
+from typing import Callable
+
+
+class Lang(Enum):
+    '''Class for language settings'''
+
+    ru = 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'
+    en = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
+
 class Visioner:
+    '''Class for encoding and decoding strings with the Visioner cipher'''
 
     ALPHABET = 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'
 
-    @staticmethod
-    def __get_indices(message_char: str, message_char_index: int, key: str) -> tuple:
-        return (Visioner.ALPHABET.find(message_char), Visioner.ALPHABET.find(key[message_char_index % len(key)]))
+    def __init__(self, lang_key: str) -> None:
+        try:
+            alphabet = Lang[lang_key].value
+        except KeyError:
+            raise KeyError('Invalid language key!')
+        else:
+            self._alphabet: str = alphabet
+            self._alph_len = len(self._alphabet)
+        pass
 
-    @staticmethod
-    def __encode_char(message_char: str, message_char_index: int, key: str) -> str:
-        indices = Visioner.__get_indices(message_char, message_char_index, key)
-        char_index = (indices[0] + indices[1]) % len(Visioner.ALPHABET)
+    def __encode_char(self, char_index: int, key_index: int) -> str:
+        '''Get a encoded char by index by formula: Ei = (Ci + Ki) mod N, where N - alphabet length'''
+        return self._alphabet[(char_index + key_index) % self._alph_len]
 
-        return Visioner.ALPHABET[char_index]
+    def __decode_char(self, char_index: int, key_index: int) -> str:
+        '''Get a decoded char by index by formula: Di = Ci - Ki, where N - alphabet length'''
+        return self._alphabet[char_index - key_index]
 
-    @staticmethod
-    def __decode_char(message_char: str, message_char_index: int, key: str) -> str:
-        indices = Visioner.__get_indices(message_char, message_char_index, key)
-        char_index = indices[0] - indices[1] + (len(Visioner.ALPHABET) if indices[0] - indices[1] < 0 else 0)
+    def __get_indices(self, index: int, char: str, key: str) -> tuple:
+        '''Find indices of a char and a key char in alphabet'''
+        char_alph_index = self._alphabet.find(char)
+        if char_alph_index == -1:
+            return -1
 
-        return Visioner.ALPHABET[char_index]
+        return (char_alph_index, self._alphabet.find(key[index % len(key)]))
 
-    @staticmethod
-    def encode(message: str, key: str) -> str:
-        return ''.join(map(lambda x: Visioner.__encode_char(x[1], x[0], key), enumerate(message.replace(' ', ''))))
+    def __visioner(self, index: int, char: str, key: str, char_transform: Callable[[int, int], str]) -> str:
+        '''Transform char with Visioner cipher by callable method'''
+        indices = self.__get_indices(index, char, key)
+        # Ignoring non-alphabet chars and symbols
+        if indices == -1:
+            return char
 
-    @staticmethod
-    def decode(message: str, key: str) -> str:
-        return ''.join(map(lambda x: Visioner.__decode_char(x[1], x[0], key), enumerate(message.replace(' ', ''))))
+        return char_transform(*indices)
+
+    def encode(self, message: str, key: str) -> str:
+        '''Encode message with Visioner cipher'''
+        return ''.join(map(lambda x: self.__visioner(x[0], x[1], key, self.__encode_char), enumerate(message)))
+
+    def decode(self, message: str, key: str) -> str:
+        '''Decode message with Visioner cipher'''
+        return ''.join(map(lambda x: self.__visioner(x[0], x[1], key, self.__decode_char), enumerate(message)))
 
 
-# print(Visioner.encode('НЕКОТОРЫЕ ДАЖЕ УТВЕРЖДАЛИ ЧТО ЕДИНСТВЕННАЯ СТРАСТЬ ХОББИТОВ ЭТО ЕДА', 'МИР'))
-# print(Visioner.decode('МЫЬМЪЭХЩРНДЬНЧЬИБЯЦРРЪСЭШНУДНТЮНУЫЙЛШЧВЧЩЛЯЕААРЛЭЕВОЧФЧЧЪ', 'МИР'))
+visioner_en = Visioner('en')
+print('Encoded en:', end=' ')
+print(visioner_en.encode('WHAT THE BUATIFUL WORLD AROUND US', 'SUN'))
+print('Decoded en:', end=' ')
+print(visioner_en.decode('OBNL GZY TONLCSMF OIEDX SLBMHQ OF', 'SUN'))
+
+visioner_ru = Visioner('ru')
+print('Encoded ru:', end=' ')
+print(visioner_ru.encode('ЧТО ЗА ЗАМЕЧАТЕЛЬНЫЙ МИР ВОКРУГ НАС', 'СОЛНЦЕ'))
+print('Decoded ru:', end=' ')
+print(visioner_ru.decode('ИБЪ ЮЕ ЦЛЪЫЬСБРЩТТМШ ЪЯХ РЪШЖШФ ЩНЗ', 'СОЛНЦЕ'))
