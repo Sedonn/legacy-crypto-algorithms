@@ -3,14 +3,14 @@ from typing import Callable
 
 
 class Lang(Enum):
-    '''Class for language settings'''
+    '''Class for language settings.'''
 
     RU = 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'
     EN = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 
 class Visioner:
-    '''Class for encoding and decoding strings with the Visioner cipher'''
+    '''Class for encoding and decoding strings with the Visioner cipher.'''
 
     def __init__(self, lang_key: str) -> None:
         try:
@@ -23,11 +23,11 @@ class Visioner:
         pass
 
     def __encode_char(self, char_index: int, key_index: int) -> str:
-        '''Get a encoded char by index by formula: Ei = (Ci + Ki) mod N, where N - alphabet length'''
+        '''Get a encoded char by index by formula: Ei = (Ci + Ki) mod N, where N - alphabet length.'''
         return self._alphabet[(char_index + key_index) % self._alph_len]
 
     def __decode_char(self, char_index: int, key_index: int) -> str:
-        '''Get a decoded char by index by formula: Di = Ci - Ki, where N - alphabet length'''
+        '''Get a decoded char by index by formula: Di = Ci - Ki, where N - alphabet length.'''
         return self._alphabet[char_index - key_index]
 
     def __get_indices(self, index: int, char: str, key: str) -> tuple:
@@ -39,7 +39,7 @@ class Visioner:
         return (char_alph_index, self._alphabet.find(key[index % len(key)]))
 
     def __visioner(self, index: int, char: str, key: str, char_transform: Callable[[int, int], str]) -> str:
-        '''Transform char with Visioner cipher by callable method'''
+        '''Transform char with Visioner cipher by callable method.'''
         indices = self.__get_indices(index, char, key)
         # Ignoring non-alphabet chars and symbols
         if indices == -1:
@@ -48,11 +48,11 @@ class Visioner:
         return char_transform(*indices)
 
     def encode(self, message: str, key: str) -> str:
-        '''Encode message with Visioner cipher'''
+        '''Encode message with Visioner cipher.'''
         return ''.join(map(lambda x: self.__visioner(x[0], x[1], key, self.__encode_char), enumerate(message)))
 
     def decode(self, message: str, key: str) -> str:
-        '''Decode message with Visioner cipher'''
+        '''Decode message with Visioner cipher.'''
         return ''.join(map(lambda x: self.__visioner(x[0], x[1], key, self.__decode_char), enumerate(message)))
 
 

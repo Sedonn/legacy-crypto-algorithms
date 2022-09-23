@@ -4,7 +4,7 @@ import numpy as np
 
 
 class Lang(Enum):
-    '''Class for language settings'''
+    '''Class for language settings.'''
 
     RU = {
         'alphabet': 'АБВГДЕЖЗИКЛМНОПРСТУФХЦЧШЩЫЬЭЮЯ',
@@ -17,7 +17,7 @@ class Lang(Enum):
 
 
 class PolybiusSquare:
-    '''Class for encoding and decoding strings with the Polybius Square cipher'''
+    '''Class for encoding and decoding strings with the Polybius Square cipher.'''
 
     def __init__(self, lang_key: str, horizontal: bool = False) -> None:
         try:
@@ -33,27 +33,27 @@ class PolybiusSquare:
         pass
 
     def __create_alphabet_matrix(self) -> np.ndarray:
-        '''Creating the matrix from alphabet with specific count of cols setted by lang'''
+        '''Creating the matrix from alphabet with specific count of cols setted by lang.'''
         return np \
             .array([*self._lang['alphabet']]) \
             .reshape((len(self._lang['alphabet']) // self._lang['col_count'], self._lang['col_count']))
 
     def __encode_char(self, matrix: np.ndarray, row_idx: int, col_idx: int) -> str:
         '''
-        Transform a char from indices to right placed from it char
-        If it placed in the end of a matrix row necessary to pick first element of row
+        Transform a char from indices to right placed from it char.
+        If it is placed in the end of a matrix row it is necessary to pick first element of row.
         '''
         return matrix[row_idx][(col_idx + 1) % self._lang['col_count']]
 
     def __decode_char(self, matrix: np.ndarray, row_idx: int, col_idx: int) -> str:
-        '''Transform a char from indices to left placed from it char'''
+        '''Transform a char from indices to left placed from it char.'''
         return matrix[row_idx][col_idx - 1]
 
     def __get_char(self, char: int, char_transform: Callable[[np.ndarray, int, int], str]) -> str:
         '''
         Get char from alphabet matrix with options:
-        is_horizontal = True - searching of a chars is performed in rows
-        is_horizontal = False - searching of a chars is performed in cols
+        1. is_horizontal = True - search of a chars is performed in rows.
+        2. is_horizontal = False - search of a chars is performed in cols.
         '''
         if self._is_horizontal:
             char_indices = np.where(self._alphabet_matrix == char)
@@ -72,17 +72,17 @@ class PolybiusSquare:
             return char_transform(self._alphabet_matrix_t, row_idx, col_idx)
 
     def __prettify(self, message: str) -> str:
-        '''Prettify message to compatibility wih key matrix'''
+        '''Prettify a message to compatibility with key matrix.'''
         return message.replace('Й', 'И').replace('Ё', 'Е').replace('J', 'I')
 
     def encode(self, message: str) -> str:
-        '''Encode message with Polybius Square cipher'''
+        '''Encode a message with the Polybius Square cipher.'''
         prettified_message = self.__prettify(message)
 
         return ''.join(map(lambda x: self.__get_char(x, self.__encode_char), prettified_message))
 
     def decode(self, message: str) -> str:
-        '''Decode message with Polybius Square cipher'''
+        '''Decode message with the Polybius Square cipher.'''
         return ''.join(map(lambda x: self.__get_char(x, self.__decode_char), message))
 
 

@@ -27,7 +27,7 @@ class Bigrams:
         pass
 
     def __prettify(self) -> None:
-        '''Prettify message to compatibility wih key matrix'''
+        '''Prettify message to compatibility with key matrix'''
         self.msg = self.msg.replace('Й', 'И')\
             .replace('Ё', 'Е')\
             .replace('J', 'I')
@@ -162,14 +162,14 @@ class Playfair:
         return msg
 
     def encode(self, text: str, key: str) -> str:
-        '''Encode message with Playfair cipher'''
-        self._bigrams = Bigrams(text).prepare(
-            self._lang['insert_char']).slice()
+        '''Encode message with the Playfair cipher'''
+        self._bigrams = Bigrams(text)\
+            .prepare(self._lang['insert_char']).slice()
 
         return self.__playfair(key, self.__encode_char)
 
     def decode(self, text: str, key: str) -> str:
-        '''Decode message with Playfair cipher'''
+        '''Decode message with the Playfair cipher'''
         self._bigrams = Bigrams(text).slice()
 
         return self.__playfair(key, self.__decode_char)
