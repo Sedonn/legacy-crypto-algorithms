@@ -5,20 +5,18 @@ from typing import Callable
 class Lang(Enum):
     '''Class for language settings'''
 
-    ru = 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'
-    en = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    RU = 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'
+    EN = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 
 class Visioner:
     '''Class for encoding and decoding strings with the Visioner cipher'''
 
-    ALPHABET = 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'
-
     def __init__(self, lang_key: str) -> None:
         try:
-            alphabet = Lang[lang_key].value
-        except KeyError:
-            raise KeyError('Invalid language key!')
+            alphabet = Lang[lang_key.upper()].value
+        except KeyError as lang_error:
+            raise KeyError('Invalid language key!') from lang_error
         else:
             self._alphabet: str = alphabet
             self._alph_len = len(self._alphabet)

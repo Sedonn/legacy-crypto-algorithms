@@ -34,7 +34,7 @@ class TranspositionCipher:
 
     def __to_string(self, matrix: np.ndarray) -> str:
         '''Formate matrix to the string'''
-        return ''.join(map(lambda x: ''.join(x), matrix))
+        return ''.join(map(''.join, matrix))
 
     def encode(self, message: str, key: str) -> str:
         '''Rearrange a cols of the matrix by sequence indices of chars in sorted key appearing on the selected mode'''

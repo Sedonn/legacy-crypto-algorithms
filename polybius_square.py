@@ -6,11 +6,11 @@ import numpy as np
 class Lang(Enum):
     '''Class for language settings'''
 
-    ru = {
+    RU = {
         'alphabet': 'АБВГДЕЖЗИКЛМНОПРСТУФХЦЧШЩЫЬЭЮЯ',
         'col_count': 6
     }
-    en = {
+    EN = {
         'alphabet': 'ABCDEFGHIKLMNOPQRSTUVWXYZ',
         'col_count': 5
     }
@@ -21,14 +21,14 @@ class PolybiusSquare:
 
     def __init__(self, lang_key: str, horizontal: bool = False) -> None:
         try:
-            lang = Lang[lang_key].value
-        except KeyError:
-            raise KeyError('Invalid language key!')
+            lang = Lang[lang_key.upper()].value
+        except KeyError as lang_error:
+            raise KeyError('Invalid language key!') from lang_error
         else:
             self._lang = lang
 
         self._alphabet_matrix = self.__create_alphabet_matrix()
-        self._alphabet_matrix_T = self._alphabet_matrix.T
+        self._alphabet_matrix_t = self._alphabet_matrix.T
         self._is_horizontal = horizontal
         pass
 
@@ -58,7 +58,7 @@ class PolybiusSquare:
         if self._is_horizontal:
             char_indices = np.where(self._alphabet_matrix == char)
         else:
-            char_indices = np.where(self._alphabet_matrix_T == char)
+            char_indices = np.where(self._alphabet_matrix_t == char)
 
         # Return not changed char if it is specical char
         if not char_indices[0].size:
@@ -69,7 +69,7 @@ class PolybiusSquare:
         if self._is_horizontal:
             return char_transform(self._alphabet_matrix, row_idx, col_idx)
         else:
-            return char_transform(self._alphabet_matrix_T, row_idx, col_idx)
+            return char_transform(self._alphabet_matrix_t, row_idx, col_idx)
 
     def __prettify(self, message: str) -> str:
         '''Prettify message to compatibility wih key matrix'''

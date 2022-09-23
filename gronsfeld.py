@@ -5,8 +5,8 @@ from typing import Callable
 
 class Lang(Enum):
     '''Class for language settings'''
-    ru = 'АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'
-    en = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    RU = 'АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'
+    EN = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 
 class Gronsfeld:
@@ -14,9 +14,9 @@ class Gronsfeld:
 
     def __init__(self, lang_key: str) -> None:
         try:
-            alphabet = Lang[lang_key].value
-        except KeyError:
-            raise KeyError('Invalid language key!')
+            alphabet = Lang[lang_key.upper()].value
+        except KeyError as lang_error:
+            raise KeyError('Invalid language key!') from lang_error
         else:
             self._alphabet = alphabet
             self._alph_len = len(alphabet)

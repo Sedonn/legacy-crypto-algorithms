@@ -1,17 +1,18 @@
 from enum import Enum
-import numpy as np
 from typing import Callable
+
+import numpy as np
 
 
 class Lang(Enum):
     '''Class for language settings'''
 
-    ru = {
+    RU = {
         'alphabet': 'АБВГДЕЖЗИКЛМНОПРСТУФХЦЧШЩЫЬЭЮЯ',
         'insert_char': 'Х',
         'col_count': 6
     }
-    en = {
+    EN = {
         'alphabet': 'ABCDEFGHIKLMNOPQRSTUVWXYZ',
         'insert_char': 'X',
         'col_count': 5
@@ -21,30 +22,30 @@ class Lang(Enum):
 class Bigrams:
     '''Class for creating bigrams'''
 
-    def __init__(self, message: str, insert_char: str, prepare: bool = True) -> None:
-        if prepare:
-            self.values = self.__prepare(self.__prettify(message), insert_char)
-        else:
-            self.values = message
+    def __init__(self, message: str) -> None:
+        self.msg = message
+        pass
+
+    def __prettify(self) -> None:
+        '''Prettify message to compatibility wih key matrix'''
+        self.msg = self.msg.replace('Й', 'И')\
+            .replace('Ё', 'Е')\
+            .replace('J', 'I')
         pass
 
     def slice(self) -> str:
         '''Creating string of bigrams - 'AABBCC' -> 'AA BB CC'''
-        bigrams = [self.values[i:i + 2] for i in range(0, len(self.values), 2)]
+        bigrams = [self.msg[i:i + 2] for i in range(0, len(self.msg), 2)]
         return ' '.join(bigrams)
 
-    def __prettify(self, message: str) -> str:
-        '''Prettify message to compatibility wih key matrix'''
-        return message.replace('Й', 'И').replace('Ё', 'Е').replace('J', 'I')
-
-    def __prepare(self, message: str, insert_char: str) -> None:
+    def prepare(self, insert_char: str):
         '''
-        Prepare bigrams before encryption
+        Prepare bigrams before encryption.
         Fill bigrams with inserting symbol at places where:
         1. Bigram has equal elements: AA BC -> AX AB C
         2. Bigram has only one element: AX AB C -> AX AB AX
         '''
-        def insert_symbol(bigrams: str):
+        def insert_symbol(bigrams: str) -> str:
             result: str = ''
             for i in range(0, len(bigrams), 2):
                 if i != len(bigrams) - 1:
@@ -61,7 +62,10 @@ class Bigrams:
 
             return result
 
-        return insert_symbol(message)
+        self.__prettify()
+        self.msg = insert_symbol(self.msg)
+
+        return self
 
 
 class Playfair:
@@ -69,16 +73,15 @@ class Playfair:
 
     def __init__(self, lang_key: str) -> None:
         try:
-            lang = Lang[lang_key].value
-        except KeyError:
-            raise KeyError('Invalid language key!')
+            lang = Lang[lang_key.upper()].value
+        except KeyError as lang_error:
+            raise KeyError('Invalid language key!') from lang_error
         else:
             self._lang = lang
 
         self._bigrams = None
         self._key_matrix = None
-        self._key_matrix_T = None
-        pass
+        self._key_matrix_t = None
 
     def __create_key_matrix(self, key: str) -> np.ndarray:
         '''Creating the key matrix from key and alphabet'''
@@ -105,8 +108,8 @@ class Playfair:
 
         if all_matrix:
             return [bigram0, bigram1]
-        else:
-            return [bigram0, bigram1] if bigram0[0] == bigram1[0] else -1
+
+        return [bigram0, bigram1] if bigram0[0] == bigram1[0] else -1
 
     def __encode_char(self, matrix: np.ndarray, row_idx: int, col_idx: int) -> str:
         '''
@@ -128,7 +131,7 @@ class Playfair:
         but at the other pair of corners of the rectangle defined by the original pair
         '''
         self._key_matrix = self.__create_key_matrix(key)
-        self._key_matrix_T = self._key_matrix.T
+        self._key_matrix_t = self._key_matrix.T
 
         msg = ''
         for bigram in self._bigrams.split(' '):
@@ -142,12 +145,12 @@ class Playfair:
                 continue
 
             # Rule 3
-            b_indices = self.__find_bigram_in(self._key_matrix_T, bigram)
+            b_indices = self.__find_bigram_in(self._key_matrix_t, bigram)
             if b_indices != -1:
                 msg += char_transform(
-                    self._key_matrix_T, b_indices[0][0], b_indices[0][1])
+                    self._key_matrix_t, b_indices[0][0], b_indices[0][1])
                 msg += char_transform(
-                    self._key_matrix_T, b_indices[1][0], b_indices[1][1])
+                    self._key_matrix_t, b_indices[1][0], b_indices[1][1])
                 continue
 
             # Rule 4
@@ -160,14 +163,14 @@ class Playfair:
 
     def encode(self, text: str, key: str) -> str:
         '''Encode message with Playfair cipher'''
-        self._bigrams = Bigrams(text, self._lang['insert_char']).slice()
+        self._bigrams = Bigrams(text).prepare(
+            self._lang['insert_char']).slice()
 
         return self.__playfair(key, self.__encode_char)
 
     def decode(self, text: str, key: str) -> str:
         '''Decode message with Playfair cipher'''
-        self._bigrams = Bigrams(
-            text, self._lang['insert_char'], prepare=False).slice()
+        self._bigrams = Bigrams(text).slice()
 
         return self.__playfair(key, self.__decode_char)
 
